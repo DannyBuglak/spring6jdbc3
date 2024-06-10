@@ -21,7 +21,9 @@ class Spring6jdbc3ApplicationTests {
         Speaker speaker = new Speaker();
         speaker.setName("Danny Buglak");
 
-        restTemplate.put("http://localhost:8080/speaker", speaker);
+        speaker = restTemplate.postForObject("http://localhost:8080/speaker", speaker, Speaker.class);
+
+        System.out.println(speaker.getName());
     }
 
     @Test
@@ -38,7 +40,51 @@ class Spring6jdbc3ApplicationTests {
         List<Speaker> speakers = speakersResponse.getBody();
 
         for (Speaker speaker : speakers) {
-            System.out.println("Speaker name: " + speaker.getName());
+            System.out.println("Speaker name: " + speaker.getName() + " " + speaker.getSkill());
         }
     }
+
+    @Test
+    void testGetSpeaker() {
+        RestTemplate restTemplate = new RestTemplate();
+
+        Speaker speaker = restTemplate.getForObject("http://localhost:8080/speaker/{id}", Speaker.class, 12);
+
+        System.out.println(speaker.getName());
+    }
+
+    @Test
+    void testUpdateSpeaker() {
+        RestTemplate restTemplate = new RestTemplate();
+
+        Speaker speaker = restTemplate.getForObject("http://localhost:8080/speaker/{id}", Speaker.class, 12);
+
+        speaker.setName(speaker.getName() + " Sr.");
+
+        restTemplate.put("http://localhost:8080/speaker", speaker);
+
+        System.out.println(speaker.getName());
+    }
+
+    @Test
+    public void testBatchUpdate() {
+        RestTemplate restTemplate = new RestTemplate();
+
+        restTemplate.getForObject("http://localhost:8080/speaker/batch", Object.class);
+    }
+
+    @Test
+    void testDeleteSpeaker() {
+        RestTemplate restTemplate = new RestTemplate();
+
+        restTemplate.delete("http://localhost:8080/speaker/delete/{id}", 20);
+    }
+
+    @Test
+    void testException() {
+        RestTemplate restTemplate = new RestTemplate();
+
+        restTemplate.getForObject("http://localhost:8080/speaker/test", Speaker.class);
+    }
+
 }
